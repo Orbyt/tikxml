@@ -809,10 +809,29 @@ public class XmlReader implements Closeable {
       }
 
       buffer.skip(p - 1);
-      if (c == '<' && !isCDATA() && !isDOCTYPE()) {
+      if (c == '<' && !isCDATA()) {
         System.out.println("welp");
         byte peek = buffer.getByte(1);
-        if (peek == '!' && fillBuffer(4)) {
+        if (peek == '!' && fillBuffer(9)) {
+          // skip DOCTYPE
+          // consume opening comment chars
+          buffer.readByte(); // '<'
+          buffer.readByte(); // '!'
+          buffer.readByte(); // 'D'
+          buffer.readByte(); // 'O'
+          buffer.readByte(); // 'C'
+          buffer.readByte(); // 'T'
+          buffer.readByte(); // 'Y'
+          buffer.readByte(); // 'P'
+          buffer.readByte(); // 'E'
+          if (!skipTo(">")) {
+            throw syntaxError("Unterminated DOCTYPE");
+          }
+          // Consume closing DOCTYPE chars
+          buffer.readByte(); // '>'
+          p = 0;
+          continue;
+        } else if (peek == '!' && !isDOCTYPE() && fillBuffer(4)) {
           // skip xml comments <!-- comment -->
           // consume opening comment chars
           buffer.readByte(); // '<'
