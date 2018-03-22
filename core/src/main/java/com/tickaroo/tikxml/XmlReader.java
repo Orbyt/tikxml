@@ -316,6 +316,21 @@ public class XmlReader implements Closeable {
         && buffer.getByte(8) == '[';
   }
 
+
+  private boolean isDOCTYPE() throws IOException {
+
+    return fillBuffer(9)
+            && buffer.getByte(0) == '<'
+            && buffer.getByte(1) == '!'
+            && buffer.getByte(2) == 'D'
+            && buffer.getByte(3) == 'O'
+            && buffer.getByte(4) == 'C'
+            && buffer.getByte(5) == 'T'
+            && buffer.getByte(6) == 'Y'
+            && buffer.getByte(7) == 'P'
+            && buffer.getByte(8) == 'E';
+  }
+
   /**
    * Consumes the next token from the JSON stream and asserts that it is the beginning of a new
    * object.
@@ -794,7 +809,7 @@ public class XmlReader implements Closeable {
       }
 
       buffer.skip(p - 1);
-      if (c == '<' && !isCDATA()) {
+      if (c == '<' && !isCDATA() && !isDOCTYPE()) {
         System.out.println("welp");
         byte peek = buffer.getByte(1);
         if (peek == '!' && fillBuffer(4)) {
