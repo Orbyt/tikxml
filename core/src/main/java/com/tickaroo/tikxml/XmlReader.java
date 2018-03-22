@@ -795,7 +795,7 @@ public class XmlReader implements Closeable {
 
       buffer.skip(p - 1);
       if (c == '<' && !isCDATA()) {
-
+        System.out.println("welp");
         byte peek = buffer.getByte(1);
         if (peek == '!' && fillBuffer(4)) {
           // skip xml comments <!-- comment -->
